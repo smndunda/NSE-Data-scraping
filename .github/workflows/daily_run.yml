@@ -1,0 +1,27 @@
+name: Daily NSE Download
+
+on:
+  schedule:
+    # 12:15 UTC is 3:15 PM Nairobi time
+    - cron: '15 12 * * 1-5' 
+  workflow_dispatch: # This allows you to run it manually to test
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Allows the bot to save the PDF to your repo
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run downloader
+        run:
