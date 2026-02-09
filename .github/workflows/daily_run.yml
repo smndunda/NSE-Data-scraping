@@ -4,13 +4,13 @@ on:
   schedule:
     # 12:15 UTC is 3:15 PM Nairobi time
     - cron: '15 12 * * 1-5' 
-  workflow_dispatch: # This allows you to run it manually to test
+  workflow_dispatch: # Allows manual testing
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Allows the bot to save the PDF to your repo
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -21,7 +21,16 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install requests beautifulsoup4
 
       - name: Run downloader
-        run:
+        run: python nse_pdf_downloader.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          # This part saves the downloaded PDF to your repo
+          git add NSE_Daily_Reports/*.pdf || true
+          git commit -m "Auto-download NSE report $(date)" || echo "No changes to commit"
+          git push
