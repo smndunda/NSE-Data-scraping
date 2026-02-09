@@ -1,3 +1,4 @@
+[![Daily NSE Download](https://github.com/smndunda/NSE-Data-scraping/actions/workflows/daily_run.yml/badge.svg)](https://github.com/smndunda/NSE-Data-scraping/actions/workflows/daily_run.yml)
 # Nairobi Securities Exchange (NSE) Daily Scraper
 
 This project automatically scrapes the Daily Equity/Bond/Derivative Price List from the NSE website 
