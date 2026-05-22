@@ -36,3 +36,26 @@ jobs:
           git add NSE_Daily_JSON/*.json || true
           git commit -m "Auto-update: PDF and JSON data $(date)" || echo "No changes"
           git push
+steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java # <--- NEW STEP
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 tabula-py pandas
+
+      - name: Run Downloader
+        run: python nse_pdf_downloader.py
+
+      - name: Run Bridge
+        run: python processor.py
