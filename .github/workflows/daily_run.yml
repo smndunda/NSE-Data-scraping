@@ -1,8 +1,8 @@
-name: Daily NSE HTML Scraper
+name: Daily NSE PDF Bridge
 
 on:
   schedule:
-    - cron: '15 12 * * 1-5' # 3:15 PM Nairobi time
+    - cron: '15 12 * * 1-5' 
   workflow_dispatch: 
 
 jobs:
@@ -20,15 +20,19 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: pip install requests pandas lxml html5lib
+        run: pip install requests beautifulsoup4 pdfplumber
 
-      - name: Run Market Scraper
-        run: python market_scraper.py
+      - name: Run Downloader
+        run: python nse_pdf_downloader.py
+
+      - name: Run Bridge (PDF to JSON)
+        run: python processor.py
 
       - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add NSE_Daily_JSON/*.json
-          git commit -m "Auto-update market JSON $(date)" || echo "No changes"
+          git add NSE_Daily_Reports/*.pdf || true
+          git add NSE_Daily_JSON/*.json || true
+          git commit -m "Bridge Update: High-Quality Financial Data $(date)" || echo "No changes"
           git push
