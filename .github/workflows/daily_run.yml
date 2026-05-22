@@ -1,10 +1,9 @@
-name: Daily NSE Download
+name: Daily NSE Download and Process
 
 on:
   schedule:
-    # 12:15 UTC is 3:15 PM Nairobi time
     - cron: '15 12 * * 1-5' 
-  workflow_dispatch: # Allows manual testing
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -21,16 +20,19 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4 pdfplumber
 
-      - name: Run downloader
+      - name: Run Downloader (Site A)
         run: python nse_pdf_downloader.py
+
+      - name: Run Bridge (PDF to JSON)
+        run: python processor.py
 
       - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          # This part saves the downloaded PDF to your repo
           git add NSE_Daily_Reports/*.pdf || true
-          git commit -m "Auto-download NSE report $(date)" || echo "No changes to commit"
+          git add NSE_Daily_JSON/*.json || true
+          git commit -m "Auto-update: PDF and JSON data $(date)" || echo "No changes"
           git push
