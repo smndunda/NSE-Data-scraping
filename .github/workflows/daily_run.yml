@@ -1,8 +1,8 @@
-name: Daily NSE Download and Process
+name: Daily NSE HTML Scraper
 
 on:
   schedule:
-    - cron: '15 12 * * 1-5' 
+    - cron: '15 12 * * 1-5' # 3:15 PM Nairobi time
   workflow_dispatch: 
 
 jobs:
@@ -20,42 +20,15 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 pdfplumber
+        run: pip install requests pandas lxml html5lib
 
-      - name: Run Downloader (Site A)
-        run: python nse_pdf_downloader.py
-
-      - name: Run Bridge (PDF to JSON)
-        run: python processor.py
+      - name: Run Market Scraper
+        run: python market_scraper.py
 
       - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add NSE_Daily_Reports/*.pdf || true
-          git add NSE_Daily_JSON/*.json || true
-          git commit -m "Auto-update: PDF and JSON data $(date)" || echo "No changes"
+          git add NSE_Daily_JSON/*.json
+          git commit -m "Auto-update market JSON $(date)" || echo "No changes"
           git push
-steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Java # <--- NEW STEP
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Install dependencies
-        run: pip install requests beautifulsoup4 tabula-py pandas
-
-      - name: Run Downloader
-        run: python nse_pdf_downloader.py
-
-      - name: Run Bridge
-        run: python processor.py
